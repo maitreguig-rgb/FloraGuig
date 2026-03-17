@@ -414,6 +414,10 @@ select.input-field{appearance:none;cursor:pointer}
 </div>
 
 <script>
+window.onerror = function(msg, src, line, col, err) {
+  document.body.innerHTML = '<div style="padding:2rem;font-family:monospace;color:red;background:white"><h2>JS Error</h2><p>' + msg + '</p><p>Line: ' + line + '</p><p>' + (err ? err.stack : '') + '</p></div>';
+  return false;
+};
 const API_KEY='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';
 const DEFAULT_ADDRESS='183 av des Jasmins, 13600 La Ciotat';
 const ZONE_COLORS=['#2d7a3a','#d4820a','#2980b9','#8e44ad','#c0392b','#16a085','#d35400','#1a6a4a','#7a3a8a','#5a7a30'];
@@ -817,7 +821,7 @@ function renderMap(){
     if(!plants.length){s+=`<text x="${x+cW/2}" y="${y+cH/2+10}" text-anchor="middle" font-family="serif" font-size="10" fill="${color}80">Aucune plante</text>`;}
   });
   svg.innerHTML=s;
-  legend.innerHTML=zones.map(z=>`<div class="legend-item"><div class="legend-dot" style="background:${ZONE_COLORS[(zone.num-1)%10]}"></div>Zone ${z.num} — ${z.name}</div>`.replace('zone.num',z.num)).join('');
+  legend.innerHTML=zones.map(z=>`<div class="legend-item"><div class="legend-dot" style="background:${ZONE_COLORS[(z.num-1)%10]}"></div>Zone ${z.num} — ${z.name}</div>`).join('');
 }
 
 // ── METEO ──────────────────────────────────────────────────
