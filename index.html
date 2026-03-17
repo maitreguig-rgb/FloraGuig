@@ -414,10 +414,6 @@ select.input-field{appearance:none;cursor:pointer}
 </div>
 
 <script>
-window.onerror = function(msg, src, line, col, err) {
-  document.body.innerHTML = '<div style="padding:2rem;font-family:monospace;color:red;background:white"><h2>JS Error</h2><p>' + msg + '</p><p>Line: ' + line + '</p><p>' + (err ? err.stack : '') + '</p></div>';
-  return false;
-};
 const API_KEY='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';
 const DEFAULT_ADDRESS='183 av des Jasmins, 13600 La Ciotat';
 const ZONE_COLORS=['#2d7a3a','#d4820a','#2980b9','#8e44ad','#c0392b','#16a085','#d35400','#1a6a4a','#7a3a8a','#5a7a30'];
@@ -1334,18 +1330,18 @@ function getAestheticTips(){
   const hasShrubs=garden.some(p=>p.type==='Arbuste');
   const fullSun=garden.filter(p=>p.light==='Plein soleil').length;
   const shade=garden.filter(p=>p.light==='Ombre'||p.light==='Ombre totale').length;
-  if(!hasFlowers)tips.push('🌸 Ajouter des fleurs');
-  if(!hasTrees)tips.push('🌳 Planter un arbre');
-  if(!hasShrubs)tips.push('🌿 Ajouter des arbustes');
-  if(!hasSucc)tips.push('🪴 Essayer des succulentes');
-  if(fullSun>shade*3)tips.push('🌳 Créer de l'ombre');
-  if(shade>fullSun*3)tips.push('☀️ Zone ensoleillée conseillée');
-  if(h>=2&&h<=4)tips.push('🌷 Saison idéale pour planter');
-  if(h>=5&&h<=7)tips.push('🌻 Penser aux annuelles d'été');
-  if(h>=8&&h<=10)tips.push('🍂 Planter des bulbes d'automne');
-  if(h>=11||h<=1)tips.push('🌱 Prévoir les semis de printemps');
+  if(!hasFlowers)tips.push("🌸 Ajouter des fleurs");
+  if(!hasTrees)tips.push("🌳 Planter un arbre");
+  if(!hasShrubs)tips.push("🌿 Ajouter des arbustes");
+  if(!hasSucc)tips.push("🪴 Essayer des succulentes");
+  if(fullSun>shade*3)tips.push("🌳 Créer de l'ombre");
+  if(shade>fullSun*3)tips.push("☀️ Zone ensoleillée conseillée");
+  if(h>=2&&h<=4)tips.push("🌷 Saison idéale pour planter");
+  if(h>=5&&h<=7)tips.push("🌻 Annuelles d'été");
+  if(h>=8&&h<=10)tips.push("🍂 Bulbes d'automne");
+  if(h>=11||h<=1)tips.push("🌱 Prévoir les semis de printemps");
   const div=new Set(garden.map(p=>p.family).filter(Boolean)).size;
-  if(div<3)tips.push('🌈 Diversifier les espèces');
+  if(div<3)tips.push("🌈 Diversifier les espèces");
   return tips.slice(0,5);
 }
 
