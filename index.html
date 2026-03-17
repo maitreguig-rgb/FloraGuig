@@ -414,7 +414,7 @@ select.input-field{appearance:none;cursor:pointer}
 </div>
 
 <script>
-const API_KEY='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';
+const API_KEY='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';
 const DEFAULT_ADDRESS='183 av des Jasmins, 13600 La Ciotat';
 const ZONE_COLORS=['#2d7a3a','#d4820a','#2980b9','#8e44ad','#c0392b','#16a085','#d35400','#1a6a4a','#7a3a8a','#5a7a30'];
 const ORIENT_OPTIONS=['Nord','Nord-Est','Est','Sud-Est','Sud','Sud-Ouest','Ouest','Nord-Ouest'];
@@ -647,7 +647,7 @@ async function saveToGarden(){
     addedAt:now,lastHealth:'good',
     timeline:[
       {id:Date.now(),type:'photo',date:now,image:imageDataURL,note:'Ajout initial — identifiée par FloraGuig'},
-      {id:Date.now()+1,type:'water',date:now,note:'Arrosage initial à l\'ajout'}
+      {id:Date.now()+1,type:'water',date:now,note:"Arrosage initial"}
     ]
   };
   garden.push(plant);saveData('fg_garden',garden);updateCount();
@@ -884,7 +884,7 @@ async function loadMeteo(){
     let tip='';
     if(daysSinceRain>5&&rainNext3<5){tip='🚿 Arrosage conseillé — aucune pluie significative depuis '+daysSinceRain+' jours et pas de précipitations prévues.';}
     else if(rainNext3>15){tip='⛱️ Arrosage inutile — de bonnes précipitations sont attendues dans les 3 prochains jours ('+rainNext3.toFixed(0)+' mm prévus).';}
-    else if(todayMax>28){tip='🌡️ Forte chaleur aujourd\'hui ('+Math.round(todayMax)+'°C) — surveille l\'hydratation de tes plantes et arrose en soirée.';}
+    else if(todayMax>28){tip="🌡️ Forte chaleur ("+Math.round(todayMax)+"°C) — surveille l'hydratation et arrose en soirée.";}
     else{tip='🌿 Conditions normales. Surveille le sol de tes plantes et arrose selon les besoins.';}
 
     mc.innerHTML=`
@@ -903,7 +903,7 @@ async function loadMeteo(){
       <div class="rain-alert ${daysSinceRain>3?'dry':'wet'}">
         <div class="rain-alert-icon">${daysSinceRain>3?'🏜️':'💧'}</div>
         <div class="rain-alert-text">
-          <strong>${daysSinceRain===0?'Pluie aujourd\'hui':daysSinceRain===1?'Dernière pluie hier':'Dernière pluie il y a '+daysSinceRain+' jour'+(daysSinceRain>1?'s':'')}</strong>
+          <strong>${daysSinceRain===0?"Pluie aujourd'hui":daysSinceRain===1?"Dernière pluie hier":'Dernière pluie il y a '+daysSinceRain+' jour'+(daysSinceRain>1?'s':'')}</strong>
           <span>Cumul 7j : ${rain7} mm · Prévus 3j : ${rainNext3.toFixed(0)} mm</span>
         </div>
       </div>
