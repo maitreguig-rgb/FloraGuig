@@ -2449,132 +2449,6 @@ const PLANT_DB = [
 {n:"Schefflera arboricola",la:"Schefflera arboricola",f:"Araliacées",t:"Arbuste",w:"Modéré",l:"Mi-ombre",o:"Taïwan"},
 {n:"Croton",la:"Codiaeum variegatum",f:"Euphorbiacées",t:"Arbuste",w:"Modéré",l:"Mi-ombre",o:"Asie SE / Pacifique"},
 {n:"Caoutchouc",la:"Ficus elastica",f:"Moracées",t:"Arbre",w:"Modéré",l:"Mi-ombre",o:"Asie tropicale"},
-];
-
-
-function searchPlantDB(query) {
-  const res = document.getElementById('searchResults');
-  if(!query || query.length < 2) { res.style.display='none'; return; }
-  const q = query.toLowerCase();
-  const matches = PLANT_DB.filter(p =>
-    p.n.toLowerCase().includes(q) ||
-    p.la.toLowerCase().includes(q) ||
-    p.f.toLowerCase().includes(q)
-  ).slice(0, 8);
-  if(!matches.length) { res.style.display='none'; return; }
-  res.innerHTML = matches.map((p,i) => `
-    <div onclick="selectPlant(${i+'_'+Date.now()})" data-idx="${PLANT_DB.indexOf(p)}"
-      style="padding:.65rem 1rem;cursor:pointer;border-bottom:1px solid rgba(45,122,58,.08);transition:background .15s"
-      onmouseover="this.style.background='rgba(45,122,58,.06)'" onmouseout="this.style.background=''">
-      <div style="font-size:.85rem;font-weight:700;color:var(--glacier)">${p.n}</div>
-      <div style="font-size:.72rem;color:var(--leaf);font-style:italic">${p.la} · <span style="font-style:normal;color:#7a9a70">${p.f} · ${p.t}</span></div>
-    </div>`).join('');
-  // Store matches for selection
-  res._matches = matches;
-  res.style.display='block';
-}
-
-function selectPlant(uid) {
-  const res = document.getElementById('searchResults');
-  const items = res.querySelectorAll('[data-idx]');
-  // Find which item was clicked by uid - use event instead
-  const clicked = event.currentTarget;
-  const idx = parseInt(clicked.getAttribute('data-idx'));
-  const p = PLANT_DB[idx];
-  if(!p) return;
-  // Fill form
-  document.getElementById('addName').value = p.n;
-  document.getElementById('addLatin').value = p.la;
-  document.getElementById('addFamily').value = p.f;
-  document.getElementById('addType').value = p.t;
-  document.getElementById('addWatering').value = p.w;
-  document.getElementById('addLight').value = p.l;
-  document.getElementById('addOrigin').value = p.o;
-  document.getElementById('plantSearch').value = p.n;
-  res.style.display='none';
-}
-
-// Close search on outside click
-document.addEventListener('click', function(e){
-  if(!e.target.closest('#plantSearch') && !e.target.closest('#searchResults')) {
-    const r = document.getElementById('searchResults');
-    if(r) r.style.display='none';
-  }
-});
-
-// ── ADD PLANT MANUALLY ────────────────────────────────────
-let addPhotoFile = null;
-
-function handleFileInput(input){
-  const file = input.files && input.files[0];
-  if(!file) return;
-  addPhotoFile = file;
-  const url = URL.createObjectURL(file);
-  document.getElementById('addPhotoPreview').innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px"/>';
-}
-
-function triggerCamera(){const el=document.getElementById('fileCamera');el.value='';el.click();}
-function triggerGallery(){const el=document.getElementById('fileGallery');el.value='';el.click();}
-
-function refreshAddZoneSelect(){
-  const sel=document.getElementById('addZoneSelect');
-  if(!sel)return;
-  sel.innerHTML='<option value="">— Aucune —</option>'+zones.map(z=>'<option value="'+z.id+'">Zone '+z.num+' — '+z.name+'</option>').join('');
-}
-
-async function addPlantManually(){
-  const name = document.getElementById('addName').value.trim();
-  if(!name){showToast('⚠️ Le nom est obligatoire');return;}
-  const latin = document.getElementById('addLatin').value.trim();
-  const family = document.getElementById('addFamily').value.trim();
-  const type = document.getElementById('addType').value;
-  const watering = document.getElementById('addWatering').value;
-  const light = document.getElementById('addLight').value;
-  const origin = document.getElementById('addOrigin').value.trim();
-  const zoneId = parseInt(document.getElementById('addZoneSelect').value)||null;
-  const notes = document.getElementById('addNotes').value.trim();
-  const now = new Date().toISOString();
-  let imageDataURL = null;
-  if(addPhotoFile){
-    const resized = await resizeImage(addPhotoFile, 400);
-    imageDataURL = await imageToDataURL(resized);
-  }
-  const plant = {
-    id:Date.now(), nickname:name, name, latin, family, type, watering, light, origin, zoneId,
-    care:'', description:'', edible:false, toxic:false,
-    addedAt:now, lastHealth:'good',
-    timeline:[
-      {id:Date.now(),type:'photo',date:now,image:imageDataURL,note:notes||'Ajout manuel'},
-      {id:Date.now()+1,type:'water',date:now,note:'Arrosage initial'}
-    ]
-  };
-  garden.push(plant); saveData('fg_garden',garden); updateCount();
-  // Reset form
-  document.getElementById('addName').value='';
-  document.getElementById('addLatin').value='';
-  document.getElementById('addFamily').value='';
-  document.getElementById('addType').value='';
-  document.getElementById('addWatering').value='';
-  document.getElementById('addLight').value='';
-  document.getElementById('addOrigin').value='';
-  document.getElementById('addNotes').value='';
-  document.getElementById('addPhotoPreview').innerHTML='<div style="text-align:center;color:#7a9a70"><div style="font-size:2rem">📷</div><div style="font-size:.78rem;margin-top:.3rem;font-weight:600">Photo (optionnel)</div></div>';
-  addPhotoFile=null;
-  showToast('✅ '+name+' ajoutée !');
-  showPage('garden');
-}
-
-// ── INIT ───────────────────────────────────────────────────
-if(userAddress){
-  const el=document.getElementById('addressInput');
-  if(el)el.value=userAddress;
-  const disp=document.getElementById('addressDisplay');
-  if(disp)disp.textContent='📍 '+userAddress;
-}
-updateCount();
-</script>
-</body>
-</html>
 // ═══════════════════════════════════════════════════════
 // ✅ PLANTES DEMANDÉES (liste personnelle)
 // ═══════════════════════════════════════════════════════
@@ -2842,3 +2716,129 @@ updateCount();
 {n:"Passiflora actinia",la:"Passiflora actinia",f:"Passifloracées",t:"Grimpante",w:"Modéré",l:"Plein soleil",o:"Brésil"},
 {n:"Passiflora cincinnata",la:"Passiflora cincinnata",f:"Passifloracées",t:"Grimpante",w:"Peu",l:"Plein soleil",o:"Amériques"},
 
+];
+
+
+function searchPlantDB(query) {
+  const res = document.getElementById('searchResults');
+  if(!query || query.length < 2) { res.style.display='none'; return; }
+  const q = query.toLowerCase();
+  const matches = PLANT_DB.filter(p =>
+    p.n.toLowerCase().includes(q) ||
+    p.la.toLowerCase().includes(q) ||
+    p.f.toLowerCase().includes(q)
+  ).slice(0, 8);
+  if(!matches.length) { res.style.display='none'; return; }
+  res.innerHTML = matches.map((p,i) => `
+    <div onclick="selectPlant(${i+'_'+Date.now()})" data-idx="${PLANT_DB.indexOf(p)}"
+      style="padding:.65rem 1rem;cursor:pointer;border-bottom:1px solid rgba(45,122,58,.08);transition:background .15s"
+      onmouseover="this.style.background='rgba(45,122,58,.06)'" onmouseout="this.style.background=''">
+      <div style="font-size:.85rem;font-weight:700;color:var(--glacier)">${p.n}</div>
+      <div style="font-size:.72rem;color:var(--leaf);font-style:italic">${p.la} · <span style="font-style:normal;color:#7a9a70">${p.f} · ${p.t}</span></div>
+    </div>`).join('');
+  // Store matches for selection
+  res._matches = matches;
+  res.style.display='block';
+}
+
+function selectPlant(uid) {
+  const res = document.getElementById('searchResults');
+  const items = res.querySelectorAll('[data-idx]');
+  // Find which item was clicked by uid - use event instead
+  const clicked = event.currentTarget;
+  const idx = parseInt(clicked.getAttribute('data-idx'));
+  const p = PLANT_DB[idx];
+  if(!p) return;
+  // Fill form
+  document.getElementById('addName').value = p.n;
+  document.getElementById('addLatin').value = p.la;
+  document.getElementById('addFamily').value = p.f;
+  document.getElementById('addType').value = p.t;
+  document.getElementById('addWatering').value = p.w;
+  document.getElementById('addLight').value = p.l;
+  document.getElementById('addOrigin').value = p.o;
+  document.getElementById('plantSearch').value = p.n;
+  res.style.display='none';
+}
+
+// Close search on outside click
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#plantSearch') && !e.target.closest('#searchResults')) {
+    const r = document.getElementById('searchResults');
+    if(r) r.style.display='none';
+  }
+});
+
+// ── ADD PLANT MANUALLY ────────────────────────────────────
+let addPhotoFile = null;
+
+function handleFileInput(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  addPhotoFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('addPhotoPreview').innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px"/>';
+}
+
+function triggerCamera(){const el=document.getElementById('fileCamera');el.value='';el.click();}
+function triggerGallery(){const el=document.getElementById('fileGallery');el.value='';el.click();}
+
+function refreshAddZoneSelect(){
+  const sel=document.getElementById('addZoneSelect');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— Aucune —</option>'+zones.map(z=>'<option value="'+z.id+'">Zone '+z.num+' — '+z.name+'</option>').join('');
+}
+
+async function addPlantManually(){
+  const name = document.getElementById('addName').value.trim();
+  if(!name){showToast('⚠️ Le nom est obligatoire');return;}
+  const latin = document.getElementById('addLatin').value.trim();
+  const family = document.getElementById('addFamily').value.trim();
+  const type = document.getElementById('addType').value;
+  const watering = document.getElementById('addWatering').value;
+  const light = document.getElementById('addLight').value;
+  const origin = document.getElementById('addOrigin').value.trim();
+  const zoneId = parseInt(document.getElementById('addZoneSelect').value)||null;
+  const notes = document.getElementById('addNotes').value.trim();
+  const now = new Date().toISOString();
+  let imageDataURL = null;
+  if(addPhotoFile){
+    const resized = await resizeImage(addPhotoFile, 400);
+    imageDataURL = await imageToDataURL(resized);
+  }
+  const plant = {
+    id:Date.now(), nickname:name, name, latin, family, type, watering, light, origin, zoneId,
+    care:'', description:'', edible:false, toxic:false,
+    addedAt:now, lastHealth:'good',
+    timeline:[
+      {id:Date.now(),type:'photo',date:now,image:imageDataURL,note:notes||'Ajout manuel'},
+      {id:Date.now()+1,type:'water',date:now,note:'Arrosage initial'}
+    ]
+  };
+  garden.push(plant); saveData('fg_garden',garden); updateCount();
+  // Reset form
+  document.getElementById('addName').value='';
+  document.getElementById('addLatin').value='';
+  document.getElementById('addFamily').value='';
+  document.getElementById('addType').value='';
+  document.getElementById('addWatering').value='';
+  document.getElementById('addLight').value='';
+  document.getElementById('addOrigin').value='';
+  document.getElementById('addNotes').value='';
+  document.getElementById('addPhotoPreview').innerHTML='<div style="text-align:center;color:#7a9a70"><div style="font-size:2rem">📷</div><div style="font-size:.78rem;margin-top:.3rem;font-weight:600">Photo (optionnel)</div></div>';
+  addPhotoFile=null;
+  showToast('✅ '+name+' ajoutée !');
+  showPage('garden');
+}
+
+// ── INIT ───────────────────────────────────────────────────
+if(userAddress){
+  const el=document.getElementById('addressInput');
+  if(el)el.value=userAddress;
+  const disp=document.getElementById('addressDisplay');
+  if(disp)disp.textContent='📍 '+userAddress;
+}
+updateCount();
+</script>
+</body>
+</html>
